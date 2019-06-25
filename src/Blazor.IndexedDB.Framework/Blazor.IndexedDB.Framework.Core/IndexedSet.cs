@@ -17,19 +17,16 @@ namespace Blazor.IndexedDB.Framework.Core
         /// </summary>
         private readonly string storeName;
 
-        private readonly ICollection<IndexedItem> indexedItems;
+        private readonly IDictionary<T, int> internalItems;
 
         public IndexedSet(IndexedDBManager indexedDBManager, string storeName)
         {
             this.indexedDBManager = indexedDBManager;
             this.storeName = storeName;
 
-            var records = this.indexedDBManager.GetRecords<T>(this.storeName).Result;
-
-
-            foreach (var record in records)
+            foreach (var item in this.indexedDBManager.GetRecords<T>(this.storeName).Result)
             {
-                indexedItems.Add(new IndexedItem())
+                this.internalItems.Add(item, item.GetHashCode());
             }
         }
 
