@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29021.104
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.IndexedDB.Framework.Core", "Blazor.IndexedDB.Framework.Core\Blazor.IndexedDB.Framework.Core.csproj", "{02BBAD0B-C957-4342-BC30-D3E9BC449229}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nugets", "nugets", "{D43B4831-CA00-47E6-B978-13133FB55C0A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TG.Blazor.IndexedDB", "nugets\Blazor.IndexedDB\TG.Blazor.IndexedDB.csproj", "{ADA4E28C-6FD6-4EA3-AF7A-492E9E6FA143}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.JS", "nugets\Blazor.IndexedDB.JS\Blazor.IndexedDB.JS.csproj", "{6A46CD34-33C4-4804-A271-A46385111790}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADA4E28C-6FD6-4EA3-AF7A-492E9E6FA143}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADA4E28C-6FD6-4EA3-AF7A-492E9E6FA143}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADA4E28C-6FD6-4EA3-AF7A-492E9E6FA143}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADA4E28C-6FD6-4EA3-AF7A-492E9E6FA143}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A46CD34-33C4-4804-A271-A46385111790}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A46CD34-33C4-4804-A271-A46385111790}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A46CD34-33C4-4804-A271-A46385111790}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A46CD34-33C4-4804-A271-A46385111790}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ADA4E28C-6FD6-4EA3-AF7A-492E9E6FA143} = {D43B4831-CA00-47E6-B978-13133FB55C0A}
+		{6A46CD34-33C4-4804-A271-A46385111790} = {D43B4831-CA00-47E6-B978-13133FB55C0A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E26EA05-234B-42C5-A19A-C0DD3370B2FA}
+	EndGlobalSection
+EndGlobal

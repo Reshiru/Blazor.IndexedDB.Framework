@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+     <TargetFramework>netstandard2.1</TargetFramework>
+    <BlazorLinkOnBuild>false</BlazorLinkOnBuild>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <DefaultItemExcludes>${DefaultItemExcludes};dist\**;node_modules\**</DefaultItemExcludes>
+    <NoWarn>CS2008</NoWarn>
+
+    
+     <!--VS's FastUpToDateCheck doesn't consider .ts file changes, so it's necessary to disable it to get incremental builds to work correctly (albeit not as fast as if FastUpToDateCheck did work for them)--> 
+    
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+  <ItemGroup>
+    <WebpackInputs Include="**\*.ts" Exclude="dist\**;node_modules\**; **\*.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebpackInputs Remove="src\InteropInterfaces.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Browser" Version="3.0.0-preview6.19307.2" />
+  </ItemGroup>
+ 
+  
+  
+  <Target Name="EnsureNpmRestored" Condition="!Exists('node_modules')">
+    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+    <Exec Command="npm install" />
+  </Target>
+
+  <Target Name="RunWebpack" AfterTargets="ResolveReferences" Inputs="@(WebpackInputs)" Outputs="dist\indexedDb.Blazor.js" DependsOnTargets="EnsureNpmRestored">
+    <RemoveDir Directories="dist" />
+    <Exec Command="npm run build:debug" Condition="'$(Configuration)' == 'Debug'" />
+     <Exec Command="npm run build:production" Condition="'$(Configuration)' != 'Debug'" />
+    <ItemGroup>
+      <EmbeddedResource Include="dist\**\*.js" LogicalName="blazor:js:%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+  </Target>
+</Project>
