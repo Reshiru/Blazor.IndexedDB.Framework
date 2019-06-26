@@ -6,4 +6,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Browser" Version="3.0.0-preview6.19307.2" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\nugets\Blazor.IndexedDB.JS\Blazor.IndexedDB.JS.csproj" />
+  </ItemGroup>
 </Project>
