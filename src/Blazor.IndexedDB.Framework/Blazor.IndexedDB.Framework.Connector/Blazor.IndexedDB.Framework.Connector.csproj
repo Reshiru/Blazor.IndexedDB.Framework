@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Blazor.IndexedDB.Framework.Connector\Blazor.IndexedDB.Framework.Connector.csproj" />
+    <ProjectReference Include="..\nugets\Blazor.IndexedDB.JS\Blazor.IndexedDB.JS.csproj" />
   </ItemGroup>
 
 </Project>

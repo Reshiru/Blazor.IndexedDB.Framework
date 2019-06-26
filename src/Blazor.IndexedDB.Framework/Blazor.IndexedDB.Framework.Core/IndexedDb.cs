@@ -1,16 +1,19 @@
-﻿using Blazor.IndexedDB.Framework.Core.Attributes;
+﻿using Blazor.IndexedDB.Framework.Connector;
+using Blazor.IndexedDB.Framework.Connector.Models;
+using Blazor.IndexedDB.Framework.Core.Attributes;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
-using TG.Blazor.IndexedDB;
+using System.Reflection;
 
 namespace Blazor.IndexedDB.Framework.Core
 {
     public abstract class IndexedDb : IDisposable
     {
-        private readonly IndexedDBManager indexedDBManager;
+        private readonly IIndexedDbConnector connector;
 
         public IndexedDb(IJSRuntime jSRuntime, string name, int version)
         {
@@ -23,11 +26,9 @@ namespace Blazor.IndexedDB.Framework.Core
                 Version = this.Version,
             };
 
-            this.indexedDBManager = new IndexedDBManager(dbStore, jSRuntime);
+            this.connector = new IndexedDbConnector(dbStore, jSRuntime as IJSInProcessRuntime);
 
             this.Build(dbStore);
-
-            this.indexedDBManager.ActionCompleted += OnIndexedDbNotification;
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Blazor.IndexedDB.Framework.Core
         /// The database version
         /// </summary>
         public int Version { get; }
-        
+
         /// <summary>
         /// All logged messages
         /// </summary>
@@ -50,7 +51,14 @@ namespace Blazor.IndexedDB.Framework.Core
             var tables = this.GetType().GetProperties()
                 .Where(x => x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(IndexedSet<>));
 
+            foreach (var table in tables)
+            {
+                var indexedSet = table.GetValue(this);
 
+                var method = indexedSet.GetType().GetMethod("GetChanged").Invoke(indexedSet, null);
+
+
+            }
         }
 
         /// <summary>
@@ -58,7 +66,6 @@ namespace Blazor.IndexedDB.Framework.Core
         /// </summary>
         public void Dispose()
         {
-            this.indexedDBManager.ActionCompleted -= OnIndexedDbNotification;
         }
 
         /// <summary>
@@ -67,6 +74,7 @@ namespace Blazor.IndexedDB.Framework.Core
         /// <param name="dbStore"></param>
         private void Build(DbStore dbStore)
         {
+            Debug.WriteLine($"{nameof(IndexedDb)} - Build - Invoked");
             // Get all "tables"
             var storeSchemaProperties = this.GetType().GetProperties()
                 .Where(x => x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(IndexedSet<>));
@@ -74,18 +82,14 @@ namespace Blazor.IndexedDB.Framework.Core
             // For all tables
             foreach (var schemaProperty in storeSchemaProperties)
             {
+                Debug.WriteLine($"{nameof(IndexedDb)} - Build - Invoked table {schemaProperty.Name}");
+
                 // Create schema
                 var schema = new StoreSchema()
                 {
                     Name = schemaProperty.Name,
                     Indexes = new List<IndexSpec>(),
                 };
-
-                // Set table to new list (index db manager has to be injected, also the store name has to be passed)
-                schemaProperty.SetValue(this, Activator.CreateInstance(schemaProperty.PropertyType, this.indexedDBManager, schemaProperty.Name));
-
-                // Add schema to registered schemas
-                dbStore.Stores.Add(schema);
 
                 // Get generic parameter of list<T> (type T, only supports IndexedSet<T> ergo 1 parameter)
                 var propertyType = schemaProperty.PropertyType.GetGenericArguments()[0];
@@ -95,6 +99,8 @@ namespace Blazor.IndexedDB.Framework.Core
 
                 foreach (var property in properties)
                 {
+                    Debug.WriteLine($"{nameof(IndexedDb)} - Build - Invoked table {schemaProperty.Name} column - {property.Name}");
+
                     // If any non supported object is used throw exception here
                     if (property.PropertyType.IsGenericType && !property.PropertyType.Namespace.StartsWith("System"))
                     {
@@ -145,19 +151,46 @@ namespace Blazor.IndexedDB.Framework.Core
                 // Create PK when not defined
                 if (schema.PrimaryKey == null)
                 {
-                    schema.PrimaryKey = new IndexSpec { Name = "Id", KeyPath = "Id", Auto = true };
+                    var idPropertyName = "Id";
+
+                    // Check for registered id property without declared key attribute
+                    if (properties.Any(x => x.Name == idPropertyName))
+                    {
+                        var idProperty = schema.Indexes.Single(x => x.Name == idPropertyName);
+
+                        // Remove from schema
+                        schema.Indexes.Remove(idProperty);
+
+                        // And set as primary key
+                        schema.PrimaryKey = idProperty;
+
+                        // Set to auto, default setting
+                        schema.PrimaryKey.Auto = true;
+                    }
+                    else
+                    {
+                        schema.PrimaryKey = new IndexSpec { Name = idPropertyName, KeyPath = idPropertyName, Auto = true };
+                    }
                 }
-            }
-        }
 
-        private void OnIndexedDbNotification(object sender, IndexedDBNotificationArgs args)
-        {
-            if (args?.Message == null)
-            {
-                return;
+                // Get generic records of table
+                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Get records of type {propertyType.Name}");
+                MethodInfo method = this.connector.GetType().GetMethod(nameof(this.connector.GetRecords));
+                MethodInfo generic = method.MakeGenericMethod(propertyType);
+                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Get records of type {propertyType.Name} INVOKED");
+                var records = generic.Invoke(this.connector, new object[] { schemaProperty.Name });
+                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Get records of type {propertyType.Name} SUCCESS");
+
+                // Set table to new list (index db manager has to be injected, also the store name has to be passed)
+                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Set value {schemaProperty.Name} to {schemaProperty.PropertyType.FullName}");
+                schemaProperty.SetValue(this, Activator.CreateInstance(schemaProperty.PropertyType, this.connector, schemaProperty.Name));
+
+                // Add schema to registered schemas
+                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Add store");
+                dbStore.Stores.Add(schema);
             }
 
-            this.Messages.Add(args.Message);
+            Debug.WriteLine($"{nameof(IndexedDb)} - Build - Done");
         }
     }
 }

@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29021.104
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.IndexedDB.Framework.Core", "Blazor.IndexedDB.Framework.Core\Blazor.IndexedDB.Framework.Core.csproj", "{02BBAD0B-C957-4342-BC30-D3E9BC449229}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework.Core", "Blazor.IndexedDB.Framework.Core\Blazor.IndexedDB.Framework.Core.csproj", "{02BBAD0B-C957-4342-BC30-D3E9BC449229}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nugets", "nugets", "{D43B4831-CA00-47E6-B978-13133FB55C0A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TG.Blazor.IndexedDB", "nugets\Blazor.IndexedDB\TG.Blazor.IndexedDB.csproj", "{ADA4E28C-6FD6-4EA3-AF7A-492E9E6FA143}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.JS", "nugets\Blazor.IndexedDB.JS\Blazor.IndexedDB.JS.csproj", "{6A46CD34-33C4-4804-A271-A46385111790}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework.Connector", "Blazor.IndexedDB.Framework.Connector\Blazor.IndexedDB.Framework.Connector.csproj", "{087A1CDF-CF3B-489D-968C-5739DC7F545D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework.Example", "Blazor.IndexedDB.Framework.Example\Blazor.IndexedDB.Framework.Example.csproj", "{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +33,14 @@ Global
 		{6A46CD34-33C4-4804-A271-A46385111790}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A46CD34-33C4-4804-A271-A46385111790}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A46CD34-33C4-4804-A271-A46385111790}.Release|Any CPU.Build.0 = Release|Any CPU
+		{087A1CDF-CF3B-489D-968C-5739DC7F545D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{087A1CDF-CF3B-489D-968C-5739DC7F545D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{087A1CDF-CF3B-489D-968C-5739DC7F545D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{087A1CDF-CF3B-489D-968C-5739DC7F545D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

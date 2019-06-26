@@ -1,0 +1,11 @@
+﻿@page "/"
+@inject IIndexedDbFactory DbFactory
+
+@{ 
+    using (var db = this.DbFactory.Create<ExampleDb>())
+    {
+        //db.People.Add(new Person());
+
+        //db.SaveChanges();
+    }
+}

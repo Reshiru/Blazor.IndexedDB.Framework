@@ -1,33 +1,34 @@
-﻿using System.Collections;
+﻿using Blazor.IndexedDB.Framework.Connector;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using TG.Blazor.IndexedDB;
 
 namespace Blazor.IndexedDB.Framework.Core
 {
     public class IndexedSet<T> : IEnumerable<T> where T : new()
     {
         /// <summary>
-        /// Injected visa <see cref="IndexedDb"/> builder.
+        /// The internal stored items
         /// </summary>
-        private readonly IndexedDBManager indexedDBManager;
+        private IList<IndexedEntity<T>> internalItems;
 
-        /// <summary>
-        /// Injected visa <see cref="IndexedDb"/> builder.
-        /// </summary>
-        private readonly string storeName;
-
-        private readonly IDictionary<T, int> internalItems;
-
-        public IndexedSet(IndexedDBManager indexedDBManager, string storeName)
+        public IndexedSet(IEnumerable<T> records)
         {
-            this.indexedDBManager = indexedDBManager;
-            this.storeName = storeName;
+            this.internalItems = new List<IndexedEntity<T>>();
+            
+            Debug.WriteLine("IndexedSet - Construct - Add records");
 
-            foreach (var item in this.indexedDBManager.GetRecords<T>(this.storeName).Result)
+            foreach (var item in records)
             {
-                this.internalItems.Add(item, item.GetHashCode());
+                this.internalItems.Add(new IndexedEntity<T>(item)
+                {
+                    State = EntityState.Unchanged
+                });
             }
+
+            Debug.WriteLine("IndexedSet - Construct - Add records DONE");
         }
 
         public bool IsReadOnly => false;
@@ -36,13 +37,9 @@ namespace Blazor.IndexedDB.Framework.Core
 
         public void Add(T item)
         {
-            if (changedEntities.ContainsKey(item))
+            if (!this.internalItems.Select(x => x.Instance).Contains(item))
             {
-                this.changedEntities[item] = EntityState.Added;
-            }
-            else
-            {
-                this.changedEntities.Add(item, EntityState.Added);
+                this.internalItems.Add(new IndexedEntity<T>(item));
             }
         }
 
@@ -50,14 +47,7 @@ namespace Blazor.IndexedDB.Framework.Core
         {
             foreach (var item in this)
             {
-                if (changedEntities.ContainsKey(item))
-                {
-                    this.changedEntities[item] = EntityState.Deleted;
-                }
-                else
-                {
-                    this.changedEntities.Add(item, EntityState.Deleted);
-                }
+                this.Remove(item);
             }
         }
 
@@ -68,28 +58,45 @@ namespace Blazor.IndexedDB.Framework.Core
 
         public bool Remove(T item)
         {
-            if (changedEntities.ContainsKey(item))
+            var internalItem = this.internalItems.FirstOrDefault(x => x.Instance.Equals(item));
+
+            if (internalItem != null)
             {
-                this.changedEntities[item] = EntityState.Deleted;
-            }
-            else
-            {
-                this.changedEntities.Add(item, EntityState.Deleted);
+                internalItem.State = EntityState.Deleted;
+
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            var records = this.indexedDBManager.GetRecords<T>(this.storeName).Result;
-                        
-            return records as IEnumerator<T>;
+            return this.internalItems.Select(x => x.Instance) as IEnumerator<T>;
         }
-        
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        internal IList<IndexedEntity<T>> GetChanged()
+        {
+            var result = new List<IndexedEntity<T>>();
+
+            foreach (var item in this.internalItems)
+            {
+                item.DetectChanges();
+
+                if (item.State == EntityState.Unchanged)
+                {
+                    continue;
+                }
+
+                result.Add(item);
+            }
+
+            return result;
         }
     }
 }
