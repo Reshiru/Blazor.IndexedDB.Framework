@@ -52,7 +52,7 @@ namespace Blazor.IndexedDB.Framework.Connector
         }
 
 
-        [JSInvokable("Callback")]
+        [JSInvokable(IndexedDbConnector.callbackMethod)]
         public void JavaScriptCallback(string message)
         {
             Debug.WriteLine(message);
