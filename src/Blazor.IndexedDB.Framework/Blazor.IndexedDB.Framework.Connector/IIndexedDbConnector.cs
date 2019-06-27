@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Blazor.IndexedDB.Framework.Connector
 {
@@ -6,6 +7,6 @@ namespace Blazor.IndexedDB.Framework.Connector
     {
         public bool Connected { get; }
 
-        IList<T> GetRecords<T>(string storeName);
+        Task<IList<T>> GetRecords<T>(string storeName);
     }
 }

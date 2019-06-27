@@ -41,11 +41,6 @@ namespace Blazor.IndexedDB.Framework.Core
         /// </summary>
         public int Version { get; }
 
-        /// <summary>
-        /// All logged messages
-        /// </summary>
-        public List<string> Messages { get; set; }
-
         public void SaveChanges()
         {
             var tables = this.GetType().GetProperties()
@@ -174,6 +169,7 @@ namespace Blazor.IndexedDB.Framework.Core
                 }
 
                 // Get generic records of table
+                // TODO: MOVE TO OTHER METHOD WHICH SHOULD BE CALLED AFTER OR WHILE CONST (ASYNC), investigate EF Core lazyloading 
                 Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Get records of type {propertyType.Name}");
                 MethodInfo method = this.connector.GetType().GetMethod(nameof(this.connector.GetRecords));
                 MethodInfo generic = method.MakeGenericMethod(propertyType);

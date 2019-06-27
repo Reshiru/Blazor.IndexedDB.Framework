@@ -1,5 +1,4 @@
-﻿using Blazor.IndexedDB.Framework.Connector;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;

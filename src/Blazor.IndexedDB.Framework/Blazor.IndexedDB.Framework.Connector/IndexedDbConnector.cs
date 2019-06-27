@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Blazor.IndexedDB.Framework.Connector
 {
@@ -33,11 +34,11 @@ namespace Blazor.IndexedDB.Framework.Connector
 
         public bool Connected { get; private set; }
         
-        public IList<T> GetRecords<T>(string storeName)
+        public async Task<IList<T>> GetRecords<T>(string storeName)
         {
             try
             {
-                var results = this.CallJavascript<List<T>>(ExposedFunctions.GetRecords, storeName);
+                var results = await this.CallJavascript<List<T>>(ExposedFunctions.GetRecords, storeName);
 
                 Debug.WriteLine($"{nameof(IndexedDbConnector)} - {nameof(GetRecords)} - Retrieved {results.Count} records from {storeName}");
 
@@ -66,16 +67,18 @@ namespace Blazor.IndexedDB.Framework.Connector
         /// <param name="functionName"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        private R CallJavascript<T, R>(string functionName, T data)
+        private async Task<R> CallJavascript<T, R>(string functionName, T data)
         {
             if (!this.Connected)
             {
-                this.Connect();
+                await this.Connect();
             }
 
             Debug.WriteLine($"{nameof(IndexedDbConnector)} - Call JS - with {functionName} data type{typeof(T).FullName}");
 
-            return this.jsRuntime.Invoke<R>($"{this.interopPrefix}.{functionName}", data);
+            var response = await this.jsRuntime.InvokeAsync<R>($"{this.interopPrefix}.{functionName}", data);
+
+            return response;
         }
 
         /// <summary>
@@ -86,25 +89,25 @@ namespace Blazor.IndexedDB.Framework.Connector
         /// <param name="functionName"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        private R CallJavascript<R>(string functionName, params object[] args)
+        private async Task<R> CallJavascript<R>(string functionName, params object[] args)
         {
             if (!this.Connected)
             {
-                this.Connect();
+                await this.Connect();
             }
 
             Debug.WriteLine($"{nameof(IndexedDbConnector)} - Call JS - with {functionName} params {string.Join(",", args)}");
 
-            var response = this.jsRuntime.Invoke<R>($"{this.interopPrefix}.{functionName}", args);
+            var response = await this.jsRuntime.InvokeAsync<R>($"{this.interopPrefix}.{functionName}", args);
 
             return response;
         }
 
-        private void Connect()
+        private async Task Connect()
         {
             Debug.WriteLine($"{nameof(IndexedDbConnector)} - Connecting");
 
-            var response = this.CallJavascript<string>(ExposedFunctions.OpenDatabase, this.dbStore, new { Instance = this.dotNetObjectRef, MethodName = IndexedDbConnector.callbackMethod });
+            var response = await this.CallJavascript<string>(ExposedFunctions.OpenDatabase, this.dbStore, new { Instance = this.dotNetObjectRef, MethodName = IndexedDbConnector.callbackMethod });
 
             Debug.WriteLine($"{nameof(IndexedDbConnector)} - Connecting CONNECTED with response {response}");
 
