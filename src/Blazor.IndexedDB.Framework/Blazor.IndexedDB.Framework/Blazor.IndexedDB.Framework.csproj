@@ -16,6 +16,7 @@
     <Copyright>(c) Joel Kessler</Copyright>
     <licenseUrl>https://github.com/Reshiru/Blazor.IndexedDB.Framework/blob/master/LICENSE</licenseUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>Reshiru.Blazor.IndexedDB.Framework</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

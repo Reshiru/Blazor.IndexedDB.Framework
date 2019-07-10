@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Blazor.IndexedDB.Framework</id>
+    <id>Reshiru.Blazor.IndexedDB.Framework</id>
     <version>1.0.0</version>
     <authors>Joel Kessler</authors>
     <owners>Joel Kessler</owners>
