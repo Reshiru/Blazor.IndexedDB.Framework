@@ -5,10 +5,25 @@
     /// </summary>
     public enum EntityState
     {
+        /// <summary>
+        /// Deleted from the database
+        /// </summary>
         Detached = 1,
+        /// <summary>
+        /// Nothing happend
+        /// </summary>
         Unchanged = 2,
+        /// <summary>
+        /// Entity added
+        /// </summary>
         Added = 4,
+        /// <summary>
+        /// Entity deleted
+        /// </summary>
         Deleted = 8,
+        /// <summary>
+        /// Entity changed
+        /// </summary>
         Modified = 16
     }
 }

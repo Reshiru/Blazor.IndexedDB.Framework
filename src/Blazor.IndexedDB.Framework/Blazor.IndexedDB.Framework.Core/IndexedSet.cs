@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 
 namespace Blazor.IndexedDB.Framework.Core
 {
@@ -11,23 +12,36 @@ namespace Blazor.IndexedDB.Framework.Core
         /// <summary>
         /// The internal stored items
         /// </summary>
-        private IList<IndexedEntity<T>> internalItems;
+        private readonly IList<IndexedEntity<T>> internalItems;
+        /// <summary>
+        /// The type T primary key, only != null if at least once requested by remove
+        /// </summary>
+        private PropertyInfo primaryKey;
 
-        public IndexedSet(IEnumerable<T> records)
+        // ToDo: Remove PK dependency
+        public IndexedSet(IEnumerable<T> records, PropertyInfo primaryKey)
         {
+            this.primaryKey = primaryKey;
             this.internalItems = new List<IndexedEntity<T>>();
-            
-            Debug.WriteLine("IndexedSet - Construct - Add records");
+
+            if (records == null)
+            {
+                return;
+            }
+
+            Debug.WriteLine($"{nameof(IndexedEntity)} - Construct - Add records");
 
             foreach (var item in records)
             {
-                this.internalItems.Add(new IndexedEntity<T>(item)
+                var indexedItem = new IndexedEntity<T>(item)
                 {
                     State = EntityState.Unchanged
-                });
+                };
+
+                this.internalItems.Add(indexedItem);
             }
 
-            Debug.WriteLine("IndexedSet - Construct - Add records DONE");
+            Debug.WriteLine($"{nameof(IndexedEntity)} - Construct - Add records DONE");
         }
 
         public bool IsReadOnly => false;
@@ -38,7 +52,12 @@ namespace Blazor.IndexedDB.Framework.Core
         {
             if (!this.internalItems.Select(x => x.Instance).Contains(item))
             {
-                this.internalItems.Add(new IndexedEntity<T>(item));
+                Debug.WriteLine($"{nameof(IndexedEntity)} - Added item of type {typeof(T).Name}");
+
+                this.internalItems.Add(new IndexedEntity<T>(item)
+                {
+                    State = EntityState.Added
+                });
             }
         }
 
@@ -65,23 +84,45 @@ namespace Blazor.IndexedDB.Framework.Core
 
                 return true;
             }
+            // If reference was lost search for pk, increases the required time
+            else
+            {
+                Debug.WriteLine("Searching for equality with PK");
 
+                var value = this.primaryKey.GetValue(item);
+
+                internalItem = this.internalItems.FirstOrDefault(x => this.primaryKey.GetValue(x.Instance).Equals(value));
+
+                if (internalItem != null)
+                {
+                    Debug.WriteLine($"Found item with id {value}");
+
+                    internalItem.State = EntityState.Deleted;
+
+                    return true;
+                }
+            }
+
+            Debug.WriteLine("Could not find internal stored item");
             return false;
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return this.internalItems.Select(x => x.Instance) as IEnumerator<T>;
+            return this.internalItems.Select(x => x.Instance).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            var enumerator =  this.GetEnumerator();
+
+            return enumerator;
         }
 
-        internal IList<IndexedEntity<T>> GetChanged()
+        // ToDo: replace change tracker with better alternative 
+        internal IList<IndexedEntity> GetChanged()
         {
-            var result = new List<IndexedEntity<T>>();
+            var result = new List<IndexedEntity>();
 
             foreach (var item in this.internalItems)
             {

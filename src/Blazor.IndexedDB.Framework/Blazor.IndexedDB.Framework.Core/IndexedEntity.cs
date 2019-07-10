@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Blazor.IndexedDB.Framework.Core
 {
-    internal class IndexedEntity<T>
+    internal class IndexedEntity<T> : IndexedEntity
     {
-        private IDictionary<string, object> snapshot;
+        internal const int defaultHashCode = -1;
+        private readonly IDictionary<string, int> snapshot;
 
-        internal IndexedEntity(T instance)
+        internal IndexedEntity(T instance) : base(instance)
         {
-            this.snapshot = new Dictionary<string, object>();
-            this.Instance = instance;
+            this.snapshot = new Dictionary<string, int>();
 
             this.TakeSnapshot();
         }
 
-        internal EntityState State { get; set; }
-
-        internal T Instance { get; }
+        internal new T Instance => (T)base.Instance;
 
         internal void TakeSnapshot()
         {
@@ -26,7 +25,10 @@ namespace Blazor.IndexedDB.Framework.Core
 
             foreach (var property in properties)
             {
-                this.snapshot.Add(property.Name, property.GetValue(this.Instance));
+                var code = property.GetValue(this.Instance)?.GetHashCode() ?? defaultHashCode;
+                // ToDo: Check if GetHashCode collisions may occour and its severity
+                this.snapshot.Add(property.Name, code);
+                Debug.WriteLine($"Took snapshot of property {property.Name} with code {code}");
             }
         }
 
@@ -43,9 +45,10 @@ namespace Blazor.IndexedDB.Framework.Core
 
             foreach (var property in properties)
             {
-                snapshot.TryGetValue(property.Name, out var originalValue);
+                this.snapshot.TryGetValue(property.Name, out var originalValue);
 
-                if (originalValue == property.GetValue(this.Instance))
+                // ToDo: Check if GetHashCode collisions may occour and its severity
+                if (originalValue == (property.GetValue(this.Instance)?.GetHashCode() ?? defaultHashCode))
                 {
                     continue;
                 }
@@ -53,5 +56,17 @@ namespace Blazor.IndexedDB.Framework.Core
                 this.State = EntityState.Modified;
             }
         }
+    }
+
+    internal abstract class IndexedEntity
+    {
+        internal IndexedEntity(object instance)
+        {
+            this.Instance = instance;
+        }
+
+        internal EntityState State { get; set; }
+
+        internal object Instance { get; }
     }
 }

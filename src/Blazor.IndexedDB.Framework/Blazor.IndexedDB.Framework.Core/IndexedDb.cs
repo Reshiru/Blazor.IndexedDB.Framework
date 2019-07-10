@@ -1,19 +1,23 @@
-﻿using Blazor.IndexedDB.Framework.Connector;
-using Blazor.IndexedDB.Framework.Connector.Models;
-using Blazor.IndexedDB.Framework.Core.Attributes;
+﻿using Blazor.IndexedDB.Framework.Core.Attributes;
+using Blazor.IndexedDB.Framework.Core.Extensions;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using TG.Blazor.IndexedDB;
 
 namespace Blazor.IndexedDB.Framework.Core
 {
     public abstract class IndexedDb : IDisposable
     {
-        private readonly IIndexedDbConnector connector;
+        private readonly Task init;
+
+        private IndexedDBManager connector;
 
         public IndexedDb(IJSRuntime jSRuntime, string name, int version)
         {
@@ -26,9 +30,21 @@ namespace Blazor.IndexedDB.Framework.Core
                 Version = this.Version,
             };
 
-            this.connector = new IndexedDbConnector(dbStore, jSRuntime as IJSInProcessRuntime);
-
+            Debug.WriteLine($"{nameof(IndexedDb)} - Building database {name} V{version}");
             this.Build(dbStore);
+
+            Debug.WriteLine($"{nameof(IndexedDb)} - Opening connector");
+            this.connector = new IndexedDBManager(dbStore, jSRuntime);
+
+            Debug.WriteLine($"{nameof(IndexedDb)} - Loading data");
+            this.init = this.LoadData();
+
+            this.connector.ActionCompleted += Connector_ActionCompleted;
+        }
+
+        private void Connector_ActionCompleted(object sender, IndexedDBNotificationArgs e)
+        {
+            Debug.WriteLine(e.Message);
         }
 
         /// <summary>
@@ -41,8 +57,21 @@ namespace Blazor.IndexedDB.Framework.Core
         /// </summary>
         public int Version { get; }
 
-        public void SaveChanges()
+        public async Task<bool> WaitForConnection()
         {
+            Debug.WriteLine("Waiting for connection...");
+
+            await Task.WhenAll(this.init);
+
+            Debug.WriteLine("Connected with " + (this.init.IsFaulted ? "Error" : "Success"));
+
+            return this.init.IsCompleted && !this.init.IsFaulted;
+        }
+
+        public async Task SaveChanges()
+        {
+            Debug.WriteLine($"Saving changes...");
+
             var tables = this.GetType().GetProperties()
                 .Where(x => x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(IndexedSet<>));
 
@@ -50,10 +79,41 @@ namespace Blazor.IndexedDB.Framework.Core
             {
                 var indexedSet = table.GetValue(this);
 
-                var method = indexedSet.GetType().GetMethod("GetChanged").Invoke(indexedSet, null);
+                var changedRows = indexedSet.GetType().GetMethod("GetChanged", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(indexedSet, null) as IList<IndexedEntity>;
 
+                // Find pk here to reduce required save time if more than one row has been deleted 
+                PropertyInfo pkProperty = null;
 
+                foreach (var row in changedRows)
+                {
+                    Debug.WriteLine($"Saving row");
+                    switch (row.State)
+                    {
+                        case EntityState.Detached:
+                        case EntityState.Unchanged:
+                            continue;
+                        case EntityState.Added:
+                            await this.AddRow(table.Name, row.Instance);
+                            break;
+                        case EntityState.Deleted:
+                            if (pkProperty == null)
+                            {
+                                pkProperty = this.GetPrimaryKey(row.Instance.GetType(), table.Name);
+                            }
+
+                            await this.DeleteRow(table.Name, row.Instance, pkProperty);
+                            break;
+                        case EntityState.Modified:
+                            await this.ChangeRow(table.Name, row.Instance);
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                    Debug.WriteLine($"Row saved");
+                }
             }
+
+            Debug.WriteLine($"All changes saved");
         }
 
         /// <summary>
@@ -61,6 +121,7 @@ namespace Blazor.IndexedDB.Framework.Core
         /// </summary>
         public void Dispose()
         {
+            this.init?.Dispose();
         }
 
         /// <summary>
@@ -69,7 +130,6 @@ namespace Blazor.IndexedDB.Framework.Core
         /// <param name="dbStore"></param>
         private void Build(DbStore dbStore)
         {
-            Debug.WriteLine($"{nameof(IndexedDb)} - Build - Invoked");
             // Get all "tables"
             var storeSchemaProperties = this.GetType().GetProperties()
                 .Where(x => x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(IndexedSet<>));
@@ -77,8 +137,6 @@ namespace Blazor.IndexedDB.Framework.Core
             // For all tables
             foreach (var schemaProperty in storeSchemaProperties)
             {
-                Debug.WriteLine($"{nameof(IndexedDb)} - Build - Invoked table {schemaProperty.Name}");
-
                 // Create schema
                 var schema = new StoreSchema()
                 {
@@ -94,8 +152,6 @@ namespace Blazor.IndexedDB.Framework.Core
 
                 foreach (var property in properties)
                 {
-                    Debug.WriteLine($"{nameof(IndexedDb)} - Build - Invoked table {schemaProperty.Name} column - {property.Name}");
-
                     // If any non supported object is used throw exception here
                     if (property.PropertyType.IsGenericType && !property.PropertyType.Namespace.StartsWith("System"))
                     {
@@ -108,6 +164,7 @@ namespace Blazor.IndexedDB.Framework.Core
                     var id = false;
                     var unique = false;
                     var autoIncrement = false;
+                    var foreignKey = false;
 
                     // Check for settings via attributes here (additonal attributes have to be checked here)
                     if (attributes.Any(x => x.AttributeType == typeof(KeyAttribute)))
@@ -122,9 +179,19 @@ namespace Blazor.IndexedDB.Framework.Core
                     {
                         autoIncrement = true;
                     }
+                    if (attributes.Any(x => x.AttributeType == typeof(ForeignKeyAttribute)))
+                    {
+                        if (id)
+                        {
+                            throw new NotSupportedException("PK cannot be FK");
+                        }
 
+                        foreignKey = true;
+                    }
+
+                    var columnName = this.FirstToLower(property.Name);
                     // Define index
-                    var index = new IndexSpec { Name = property.Name, KeyPath = property.Name, Auto = autoIncrement, Unique = unique };
+                    var index = new IndexSpec { Name = columnName, KeyPath = columnName, Auto = autoIncrement, Unique = unique };
 
                     // Register index
                     if (id)
@@ -132,13 +199,18 @@ namespace Blazor.IndexedDB.Framework.Core
                         // Throw invalid operation when index has already been defined
                         if (schema.PrimaryKey != null)
                         {
-                            throw new InvalidOperationException();
+                            throw new InvalidOperationException("PK already defined");
                         }
 
+                        Debug.WriteLine($"{nameof(IndexedDb)} - {schemaProperty.Name} - PK-> {columnName}");
+
+                        index.Auto = true;
                         schema.PrimaryKey = index;
                     }
-                    else
+                    else if (!foreignKey)
                     {
+                        Debug.WriteLine($"{nameof(IndexedDb)} - {schemaProperty.Name} - Property -> {columnName}");
+
                         schema.Indexes.Add(index);
                     }
                 }
@@ -147,11 +219,12 @@ namespace Blazor.IndexedDB.Framework.Core
                 if (schema.PrimaryKey == null)
                 {
                     var idPropertyName = "Id";
+                    var idColumnName = this.FirstToLower(idPropertyName);
 
                     // Check for registered id property without declared key attribute
                     if (properties.Any(x => x.Name == idPropertyName))
                     {
-                        var idProperty = schema.Indexes.Single(x => x.Name == idPropertyName);
+                        var idProperty = schema.Indexes.Single(x => x.Name == idColumnName);
 
                         // Remove from schema
                         schema.Indexes.Remove(idProperty);
@@ -164,29 +237,156 @@ namespace Blazor.IndexedDB.Framework.Core
                     }
                     else
                     {
-                        schema.PrimaryKey = new IndexSpec { Name = idPropertyName, KeyPath = idPropertyName, Auto = true };
+                        throw new NotSupportedException("Missing id property");
+                        // Not supported because no implementation for changed check when deleted (missing id to resolve object in store)
+                        //schema.PrimaryKey = new IndexSpec { Name = idColumnName, KeyPath = idColumnName, Auto = true };
                     }
                 }
 
-                // Get generic records of table
-                // TODO: MOVE TO OTHER METHOD WHICH SHOULD BE CALLED AFTER OR WHILE CONST (ASYNC), investigate EF Core lazyloading 
-                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Get records of type {propertyType.Name}");
-                MethodInfo method = this.connector.GetType().GetMethod(nameof(this.connector.GetRecords));
-                MethodInfo generic = method.MakeGenericMethod(propertyType);
-                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Get records of type {propertyType.Name} INVOKED");
-                var records = generic.Invoke(this.connector, new object[] { schemaProperty.Name });
-                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Get records of type {propertyType.Name} SUCCESS");
-
-                // Set table to new list (index db manager has to be injected, also the store name has to be passed)
-                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Set value {schemaProperty.Name} to {schemaProperty.PropertyType.FullName}");
-                schemaProperty.SetValue(this, Activator.CreateInstance(schemaProperty.PropertyType, this.connector, schemaProperty.Name));
-
                 // Add schema to registered schemas
-                Debug.WriteLine($"{nameof(IndexedDb)} - Build - {schemaProperty.Name} - Add store");
                 dbStore.Stores.Add(schema);
             }
+            Debug.WriteLine($"{nameof(IndexedDb)} - Schema has been built");
+        }
 
-            Debug.WriteLine($"{nameof(IndexedDb)} - Build - Done");
+        /// <summary>
+        /// First char to lower case
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private string FirstToLower(string input)
+        {
+            if (input != string.Empty && char.IsUpper(input[0]))
+            {
+                input = char.ToLower(input[0]) + input.Substring(1);
+            }
+
+            return input;
+        }
+
+        /// <summary>
+        /// Gets the pk from a table by any row type hold within the table
+        /// </summary>
+        /// <param name="rowType"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        private PropertyInfo GetPrimaryKey(Type rowType, string tableName)
+        {
+            Debug.WriteLine($"Trying to resolve PK for {rowType.Name} in table {tableName}");
+
+            var storePk = this.connector.Stores.Single(x => x.Name == tableName).PrimaryKey.KeyPath;
+
+            return rowType.GetProperties().Single(x => this.FirstToLower(x.Name) == storePk);
+        }
+
+        private async Task LoadData()
+        {
+            // Get all tables
+            var tables = this.GetType().GetProperties()
+                .Where(x => x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(IndexedSet<>));
+
+            foreach (var table in tables)
+            {
+                // Get generic parameter of list<T> (type T, only supports IndexedSet<T> ergo 1 parameter)
+                var propertyType = table.PropertyType.GetGenericArguments()[0];
+
+                // Get generic records of table
+                Debug.WriteLine($"{nameof(IndexedDb)} - Load table {table.Name}");
+                var records = await this.GetRows(propertyType, table.Name);
+
+                var pkProperty = this.GetPrimaryKey(propertyType, table.Name);
+
+                Debug.WriteLine($"{nameof(IndexedDb)} - Set table {table.Name}");
+                table.SetValue(this, Activator.CreateInstance(table.PropertyType, records, pkProperty));
+
+            }
+        }
+
+        private async Task<object> GetRows(Type propertyType, string storeName)
+        {
+            MethodInfo method = this.connector.GetType().GetMethod(nameof(this.connector.GetRecords));
+            MethodInfo generic = method.MakeGenericMethod(propertyType);
+            var records = await generic.InvokeAsyncWithResult(this.connector, new object[] { storeName });
+
+            return records;
+        }
+
+        /// <summary>
+        /// Removes a row from the store
+        /// </summary>
+        /// <param name="storeName"></param>
+        /// <param name="data"></param>
+        /// <param name="pkProperty"></param>
+        /// <returns></returns>
+        private async Task DeleteRow(string storeName, object data, PropertyInfo pkProperty)
+        {
+            var pkValue = pkProperty.GetValue(data);
+
+            await this.connector.DeleteRecord<object>(storeName, pkValue);
+        }
+
+        /// <summary>
+        /// Adds a row to the store
+        /// </summary>
+        /// <param name="storeName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private async Task AddRow(string storeName, object data)
+        {
+            var storeRecord = this.ConvertToObjectRecord(storeName, data);
+
+            await this.connector.AddRecord<object>(storeRecord);
+
+            // TODO: OLD GENERIC IMPLEMENTATION / REMOVE
+            //Type[] typeArgs = { data.GetType() };
+            //var storeRecordType = typeof(StoreRecord<>).MakeGenericType(typeArgs);
+            //var storeRecord = Activator.CreateInstance(storeRecordType);
+
+            //storeRecordType.GetProperty("Data").SetValue(storeRecord, data);
+            //storeRecordType.GetProperty("Storename").SetValue(storeRecord, storeName);
+
+            //MethodInfo method = this.connector.GetType().GetMethod(nameof(this.connector.AddRecord));
+            //MethodInfo generic = method.MakeGenericMethod(data.GetType());
+
+            //await generic.InvokeAsync(this.connector, new object[] { storeRecord });
+        }
+
+        /// <summary>
+        /// Changes the row data in the store
+        /// </summary>
+        /// <param name="storeName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private async Task ChangeRow(string storeName, object data)
+        {
+            var storeRecord = this.ConvertToObjectRecord(storeName, data);
+
+            await this.connector.UpdateRecord<object>(storeRecord);
+        }
+
+        // Only required to save to database, resolve will be = to object properties
+        // Because -> Obj Person {"FirstName":"A","LastName":"B"} = Dictionary<string, object> {"FirstName":"A","LastName":"B"}
+        // Usage dictionary instead of type for the possibility of ignoring properties, eg ForeignKeyAttribute properties
+        private StoreRecord<object> ConvertToObjectRecord(string storeName, object data)
+        {
+            var properties = data.GetType().GetProperties().Where(x => x.CustomAttributes.All(y => y.AttributeType != typeof(ForeignKeyAttribute)));
+
+            var keyValueData = new Dictionary<string, object>();
+
+            foreach (var property in properties)
+            {
+                var propertyNameInStore = this.FirstToLower(property.Name);
+
+                keyValueData.Add(propertyNameInStore, property.GetValue(data));
+            }
+
+            var storeRecord = new StoreRecord<object>()
+            {
+                Data = keyValueData,
+                Storename = storeName
+            };
+
+            return storeRecord;
         }
     }
 }
