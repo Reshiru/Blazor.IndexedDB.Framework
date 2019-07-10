@@ -4,7 +4,7 @@ An easy way to interact with IndexedDB and make it feel like EFCore but async.
 
 # NuGet installation
 ```powershell
-PM> Install-Package Fody
+PM> Install-Package Reshiru.Blazor.IndexedDB.Framework
 ```
 
 ## Current features
@@ -40,7 +40,7 @@ public class ExampleDb : IndexedDb
 [System.ComponentModel.DataAnnotations.Key]
 ```
 
-Example: 
+* Example
 ```CSharp
 public class Person
 {
