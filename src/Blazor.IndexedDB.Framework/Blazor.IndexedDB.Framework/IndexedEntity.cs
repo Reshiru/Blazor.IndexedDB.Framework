@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Blazor.IndexedDB.Framework.Core
+namespace Blazor.IndexedDB.Framework
 {
     internal class IndexedEntity<T> : IndexedEntity
     {

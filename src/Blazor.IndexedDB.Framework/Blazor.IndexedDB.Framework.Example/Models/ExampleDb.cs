@@ -1,4 +1,4 @@
-﻿using Blazor.IndexedDB.Framework.Core;
+﻿using Blazor.IndexedDB.Framework;
 using Microsoft.JSInterop;
 
 namespace Blazor.IndexedDB.Framework.Example.Models
