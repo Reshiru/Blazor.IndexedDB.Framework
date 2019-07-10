@@ -2,6 +2,11 @@
 
 An easy way to interact with IndexedDB and make it feel like EFCore but async.
 
+# NuGet installation
+```powershell
+PM> Install-Package Fody
+```
+
 ## Current features
 0. Connect and create database
 1. Add record
@@ -80,3 +85,9 @@ using (var db = await this.DbFactory.Create<ExampleDb>())
   await db.SaveChanges();
 }
 ```
+
+## License
+
+Copyright (c) Joel Kessler. All rights reserved.
+
+Licensed under the [MIT](LICENSE) license.
