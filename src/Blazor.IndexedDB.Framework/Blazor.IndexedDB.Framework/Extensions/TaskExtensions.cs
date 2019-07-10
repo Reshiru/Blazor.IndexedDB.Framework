@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Blazor.IndexedDB.Framework.Core.Extensions
+namespace Blazor.IndexedDB.Framework.Extensions
 {
     internal static class TaskExtensions
     {

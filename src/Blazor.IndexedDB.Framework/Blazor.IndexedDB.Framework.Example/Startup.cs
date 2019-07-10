@@ -1,4 +1,4 @@
-using Blazor.IndexedDB.Framework.Core;
+using Blazor.IndexedDB.Framework;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 

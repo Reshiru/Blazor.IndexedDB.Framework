@@ -1,4 +1,4 @@
-﻿namespace Blazor.IndexedDB.Framework.Core
+﻿namespace Blazor.IndexedDB.Framework
 {
     /// <summary>
     /// Based on: https://docs.microsoft.com/en-us/dotnet/api/system.data.entitystate?view=netframework-4.8

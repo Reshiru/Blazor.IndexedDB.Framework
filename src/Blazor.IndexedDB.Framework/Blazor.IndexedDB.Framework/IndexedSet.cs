@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace Blazor.IndexedDB.Framework.Core
+namespace Blazor.IndexedDB.Framework
 {
     public class IndexedSet<T> : IEnumerable<T> where T : new()
     {

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29021.104
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework.Core", "Blazor.IndexedDB.Framework.Core\Blazor.IndexedDB.Framework.Core.csproj", "{02BBAD0B-C957-4342-BC30-D3E9BC449229}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework", "Blazor.IndexedDB.Framework\Blazor.IndexedDB.Framework.csproj", "{02BBAD0B-C957-4342-BC30-D3E9BC449229}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework.Example", "Blazor.IndexedDB.Framework.Example\Blazor.IndexedDB.Framework.Example.csproj", "{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}"
 EndProject

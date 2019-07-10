@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Blazor.IndexedDB.Framework.Core
+namespace Blazor.IndexedDB.Framework
 {
     public class IndexedDbFactory : IIndexedDbFactory
     {
