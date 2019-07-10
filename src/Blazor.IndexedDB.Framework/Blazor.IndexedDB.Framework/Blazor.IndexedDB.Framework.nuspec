@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>Blazor.IndexedDB.Framework</id>
-    <version>1.0.0-beta</version>
+    <version>1.0.0</version>
     <authors>Joel Kessler</authors>
     <owners>Joel Kessler</owners>
     <license type="expression">MIT</license>
     <repository type="Git" url="https://github.com/Reshiru/Blazor.IndexedDB.Framework/" />
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A Blazor framework for interacting with IndexedDB</description>
-    <releaseNotes>Release 1.0.0-beta</releaseNotes>
+    <releaseNotes>Release 1.0.0</releaseNotes>
     <copyright>Copyright 2019 Joel Kessler</copyright>
     <tags>Microsoft ASP.NET Core Blazor IndexedDB</tags>
     <dependencies>
