@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29021.104
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework.Core", "Blazor.IndexedDB.Framework.Core\Blazor.IndexedDB.Framework.Core.csproj", "{02BBAD0B-C957-4342-BC30-D3E9BC449229}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework.Example", "Blazor.IndexedDB.Framework.Example\Blazor.IndexedDB.Framework.Example.csproj", "{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E26EA05-234B-42C5-A19A-C0DD3370B2FA}
+	EndGlobalSection
+EndGlobal
