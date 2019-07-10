@@ -7,7 +7,7 @@
     <RazorLangVersion>3.0</RazorLangVersion>
     <LangVersion>7.3</LangVersion>
     <AssemblyName>Blazor.IndexedDB.Framework</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Joel Kessler</Authors>
     <Description>A Blazor framework for interacting with IndexedDB</Description>
     <RepositoryUrl>https://github.com/Reshiru/Blazor.IndexedDB.Framework/</RepositoryUrl>
@@ -17,6 +17,7 @@
     <licenseUrl>https://github.com/Reshiru/Blazor.IndexedDB.Framework/blob/master/LICENSE</licenseUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageId>Reshiru.Blazor.IndexedDB.Framework</PackageId>
+    <PackageIconUrl>https://github.com/Reshiru/Blazor.IndexedDB.Framework/blob/master/logo.png?raw=true</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
