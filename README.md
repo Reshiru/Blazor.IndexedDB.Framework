@@ -1,6 +1,6 @@
 [![NuGet Status](http://img.shields.io/nuget/v/Reshiru.Blazor.IndexedDB.Framework.svg?style=flat&max-age=86400)](https://www.nuget.org/packages/Reshiru.Blazor.IndexedDB.Framework/)
 
-# <img src="https://github.com/Reshiru/Blazor.IndexedDB.Framework/blob/master/logo.svg" height="28px"> Blazor.IndexedDB.Framework
+# <img src="https://raw.githubusercontent.com/Reshiru/Blazor.IndexedDB.Framework/master/logo.svg?sanitize=true" height="28px"> Blazor.IndexedDB.Framework
 
 An easy way to interact with IndexedDB and make it feel like EFCore but async.
 
@@ -39,14 +39,9 @@ public class ExampleDb : IndexedDb
 ```
 - Your model (eg. person) should contain an Id property or a property marked with the key attribute.
 ```CSharp
-[System.ComponentModel.DataAnnotations.Key]
-```
-
-* Example
-```CSharp
 public class Person
 {
-  [Key]
+  [System.ComponentModel.DataAnnotations.Key]
   public long Id { get; set; }
   public string FirstName { get; set; }
   public string LastName { get; set; }
