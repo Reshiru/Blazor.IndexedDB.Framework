@@ -1,30 +1,25 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
 
 namespace Blazor.IndexedDB.Framework.Example.Models
 {
     public class Person
     {
-        [Key]
         public long Id { get; set; }
 
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
 
-        [ForeignKey(nameof(DogId))]
-        [Browsable(false)]
-        public Dog Dog { get; set; } = new Dog()
-        {
-            Id = 10
-        };
+        // Idk just 1:1
+        public Token Token { get; set; }
 
-        public long DogId { get; set; }
-    }
+        // 1:n
+        public Address Address { get; set; }
 
-    public class Dog
-    {
-        public long Id { get; set; }
+        // n:m
+        public ICollection<Dog> Dog { get; set; }
+
+        // n:n self
+        public ICollection<Person> Family { get; set; }
     }
 }

@@ -5,7 +5,7 @@
 @code{
 protected async Task Create()
 {
-    using (var db = await this.DbFactory.Create<ExampleDb>())
+    using (var db = await this.DbFactory.Create<ExampleDb>(2))
     {
         //var t = db.People.Include(x => x.Dog);
         //db.People.Remove(new Person()
