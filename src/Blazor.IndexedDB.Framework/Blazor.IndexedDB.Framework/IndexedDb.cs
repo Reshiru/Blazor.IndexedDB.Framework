@@ -78,13 +78,11 @@ namespace Blazor.IndexedDB.Framework
             foreach (var table in tables)
             {
                 var indexedSet = table.GetValue(this);
-
-                var changedRows = indexedSet.GetType().GetMethod("GetChanged", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(indexedSet, null) as IList<IndexedEntity>;
-
+                
                 // Find pk here to reduce required save time if more than one row has been deleted 
                 PropertyInfo pkProperty = null;
 
-                foreach (var row in changedRows)
+                foreach (var row in indexedSet.GetType().GetMethod("GetChanged", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(indexedSet, null) as IEnumerable<IndexedEntity>)
                 {
                     Debug.WriteLine($"Saving row");
                     switch (row.State)

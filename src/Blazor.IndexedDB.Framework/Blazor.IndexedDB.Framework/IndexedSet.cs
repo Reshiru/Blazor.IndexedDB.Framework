@@ -120,10 +120,8 @@ namespace Blazor.IndexedDB.Framework
         }
 
         // ToDo: replace change tracker with better alternative 
-        internal IList<IndexedEntity> GetChanged()
+        internal IEnumerable<IndexedEntity> GetChanged()
         {
-            var result = new List<IndexedEntity>();
-
             foreach (var item in this.internalItems)
             {
                 item.DetectChanges();
@@ -133,10 +131,9 @@ namespace Blazor.IndexedDB.Framework
                     continue;
                 }
 
-                result.Add(item);
+                Debug.WriteLine("Item yield");
+                yield return item;
             }
-
-            return result;
         }
     }
 }
