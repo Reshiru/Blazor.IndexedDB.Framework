@@ -18,8 +18,9 @@ PM> Install-Package Reshiru.Blazor.IndexedDB.Framework
 ## Planned features or optimizations
 1. FK implementation
 2. Optimize change tracker (currently using snapshotting mechanism based using hashes)
-3. Remove PK dependencies from IndexedSet
-4. Versioning (eg. merging database)?
+3. Query data without loading everything first (Switch to C# 8.0 and use async yield)
+4. Remove PK dependencies from IndexedSet
+5. Versioning (eg. merging database)? > When especially requested and clarified what is needed (create issue)
 
 ## How to use
 1. In your startup.cs file add
