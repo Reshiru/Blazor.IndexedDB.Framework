@@ -19,7 +19,8 @@ protected async Task Create()
             db.People.Add(new Person()
             {
                 FirstName = Guid.NewGuid().ToString(),
-                LastName = Guid.NewGuid().ToString()
+                LastName = Guid.NewGuid().ToString(),
+                Username = Guid.NewGuid().ToString()
             });
         }
         //await db.SaveChanges();
