@@ -10,17 +10,18 @@ PM> Install-Package Reshiru.Blazor.IndexedDB.Framework
 ```
 
 ## Current features
-0. Connect and create database
-1. Add record
-2. Remove record
-3. Edit record
+- Connect and create database
+- Add record
+- Remove record
+- Edit record
 
-## Planned features or optimizations
-1. FK implementation
-2. Optimize change tracker (currently using snapshotting mechanism based using hashes)
-3. Query data without loading everything first (Switch to C# 8.0 and use async yield)
-4. Remove PK dependencies from IndexedSet
-5. Versioning (eg. merging database)? > When especially requested and clarified what is needed (create issue)
+## Planned features or optimizations 
+- FK implementation
+- Optimize change tracker (currently using snapshotting mechanism based using hashes)
+- Query data without loading everything first (Switch to C# 8.0 and use async yield)
+- Remove PK dependencies from IndexedSet
+- Versioning (eg. merging database)
+- SaveChanges should await all transactions and rollback everything within the scope if something went wrong while other data was already saved.
 
 ## How to use
 1. In your startup.cs file add
