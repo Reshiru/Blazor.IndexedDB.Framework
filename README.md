@@ -23,6 +23,9 @@ PM> Install-Package Reshiru.Blazor.IndexedDB.Framework
 - Versioning (eg. merging database)
 - SaveChanges should await all transactions and rollback everything within the scope if something went wrong while other data was already saved.
 
+## NOTES
+Because my time is currently very limited, I'm not able to contribute for the time beeing. Also I would highly appreciate any external contribution to the project.
+
 ## How to use
 1. In your startup.cs file add
 ```CSharp
