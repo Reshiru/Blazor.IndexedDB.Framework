@@ -1,10 +1,13 @@
 ﻿@page "/"
 @inject IIndexedDbFactory DbFactory
 
-<button @onclick="@Create">Click me</button>
-@code{
+<button @onclick="Create">Click me</button>
+
+@code {
+    
 protected async Task Create()
 {
+    System.Console.WriteLine("Creating database...");
     using (var db = await this.DbFactory.Create<ExampleDb>())
     {
         //var t = db.People.Include(x => x.Dog);
