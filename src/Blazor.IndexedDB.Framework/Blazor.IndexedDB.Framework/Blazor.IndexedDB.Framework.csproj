@@ -22,9 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
-    <!-- <PackageReference Include="TG.Blazor.IndexedDB" Version="1.2.0-preview" /> -->
-    <ProjectReference Include="..\..\..\..\Blazor.IndexedDB\Blazor.IndexedDB\TG.Blazor.IndexedDB.csproj" />
-    <ProjectReference Include="..\..\..\..\Blazor.IndexedDB\Blazor.IndexedDB.JS\Blazor.IndexedDB.JS.csproj" />
+    <PackageReference Include="TG.Blazor.IndexedDB" Version="1.2.1-preview" />
   </ItemGroup>
 
 </Project>
