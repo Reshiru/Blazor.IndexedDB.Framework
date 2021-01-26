@@ -1,6 +1,4 @@
-[![NuGet Status](http://img.shields.io/nuget/v/Reshiru.Blazor.IndexedDB.Framework.svg?style=flat&max-age=86400)](https://www.nuget.org/packages/Reshiru.Blazor.IndexedDB.Framework/)
-
-# <img src="https://raw.githubusercontent.com/Reshiru/Blazor.IndexedDB.Framework/master/logo.svg?sanitize=true" height="28px"> Blazor.IndexedDB.Framework
+# <img src="https://raw.githubusercontent.com/Reshiru/Blazor.IndexedDB.Framework/master/logo.svg?sanitize=true" height="28px"> ARCHIVED: Blazor.IndexedDB.Framework
 
 An easy way to interact with IndexedDB and make it feel like EFCore but async.
 
@@ -14,17 +12,6 @@ PM> Install-Package Reshiru.Blazor.IndexedDB.Framework
 - Add record
 - Remove record
 - Edit record
-
-## Planned features or optimizations 
-- FK implementation
-- Optimize change tracker (currently using snapshotting mechanism based using hashes)
-- Query data without loading everything first (Switch to C# 8.0 and use async yield)
-- Remove PK dependencies from IndexedSet
-- Versioning (eg. merging database)
-- SaveChanges should await all transactions and rollback everything within the scope if something went wrong while other data was already saved.
-
-## NOTES
-Because my time is currently very limited, I'm not able to contribute for the time beeing. Also I would highly appreciate any external contribution to the project.
 
 ## How to use
 1. In your startup.cs file add
@@ -89,7 +76,4 @@ using (var db = await this.DbFactory.Create<ExampleDb>())
 ```
 
 ## License
-
-Copyright (c) Joel Kessler. All rights reserved.
-
 Licensed under the [MIT](LICENSE) license.
