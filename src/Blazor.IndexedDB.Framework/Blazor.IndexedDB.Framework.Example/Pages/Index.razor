@@ -1,9 +1,9 @@
 ﻿@page "/"
 @inject IIndexedDbFactory DbFactory
 
-<button @onclick="@Create">Click me</button>
+<button  @onclick="@(e => Create(e))">Click me</button>
 @code{
-protected async Task Create()
+protected async Task Create(MouseEventArgs e)
 {
     using (var db = await this.DbFactory.Create<ExampleDb>())
     {
