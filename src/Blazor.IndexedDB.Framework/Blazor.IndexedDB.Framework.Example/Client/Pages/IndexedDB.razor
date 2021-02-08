@@ -1,0 +1,73 @@
+﻿@page "/IndexedDB"
+@using Blazor.IndexedDB.Framework
+@using BlazorIndexedDBTestProject.Shared
+
+@inject IIndexedDbFactory DbFactory
+
+<h3>IndexedDB</h3>
+<fieldset>
+    <legend>Add new person</legend>
+    <EditForm Model="@newPerson" OnValidSubmit="@SaveNewPerson">
+        <InputText @bind-Value="@newPerson.FirstName" placeholder="First name..." />
+        <InputText @bind-Value="@newPerson.LastName" placeholder="Last name..." />
+        <button type="submit">Add</button>
+
+        <p><ValidationSummary /></p>
+        <DataAnnotationsValidator />
+    </EditForm>
+</fieldset>
+
+@if (people != null)
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>First name</th>
+            <th>Last name</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var person in people)
+        {
+            <tr>
+                <td>@person.Id</td>
+                <td>@person.FirstName</td>
+                <td>@person.LastName</td>
+                <td><td><button @onclick="@(() => DeletePerson(person))">Delete</button></td></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+@code {
+    List<Person> people;
+    Person newPerson = new Person();
+
+
+    protected override async Task OnInitializedAsync() 
+    {
+        using var db = await DbFactory.Create<ExampleDb>();
+        people = db.People.ToList();
+    }
+
+    async Task SaveNewPerson()
+    {
+        using var db = await this.DbFactory.Create<ExampleDb>();
+        db.People.Add(newPerson);
+        await db.SaveChanges();
+
+    // Refresh list and reset the form
+        newPerson = new Person();
+        await OnInitializedAsync();
+    }
+    async Task DeletePerson(Person person)
+    {
+        using var db = await this.DbFactory.Create<ExampleDb>();
+        db.People.Remove(person);
+        await db.SaveChanges();
+        await OnInitializedAsync();
+    }
+
+}

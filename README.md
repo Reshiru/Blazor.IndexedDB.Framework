@@ -18,6 +18,10 @@ PM> Install-Package Reshiru.Blazor.IndexedDB.Framework
 ```CSharp
 services.AddSingleton<IIndexedDbFactory, IndexedDbFactory>();
 ```
+index.html
+```html
+ <script src="_content/TG.Blazor.IndexedDB/indexedDb.Blazor.js"></script>
+```
 IIndexedDbFactory is used to create your database connection and will create the database instance for you.
 IndexedDbFactory requires an instance IJSRuntime, should normally already be registered.
 

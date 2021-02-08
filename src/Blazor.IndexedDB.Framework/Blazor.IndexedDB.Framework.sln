@@ -5,7 +5,13 @@ VisualStudioVersion = 16.0.29021.104
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework", "Blazor.IndexedDB.Framework\Blazor.IndexedDB.Framework.csproj", "{02BBAD0B-C957-4342-BC30-D3E9BC449229}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.IndexedDB.Framework.Example", "Blazor.IndexedDB.Framework.Example\Blazor.IndexedDB.Framework.Example.csproj", "{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{2D70211F-102E-40A1-ACE0-F5D54EB85D2F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorIndexedDBTestProject.Server", "Blazor.IndexedDB.Framework.Example\Server\BlazorIndexedDBTestProject.Server.csproj", "{AACE79B7-4E2B-4741-8C01-BAFDD3456099}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorIndexedDBTestProject.Shared", "Blazor.IndexedDB.Framework.Example\Shared\BlazorIndexedDBTestProject.Shared.csproj", "{25063C72-C9E0-428C-B0E7-4FA782C9A0C0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorIndexedDBTestProject.Client", "Blazor.IndexedDB.Framework.Example\Client\BlazorIndexedDBTestProject.Client.csproj", "{5C9B24C9-2275-49C3-B090-D2A72A818E62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,13 +23,26 @@ Global
 		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02BBAD0B-C957-4342-BC30-D3E9BC449229}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B6AD5AA-3A6D-43E7-A28A-E577BE3545B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AACE79B7-4E2B-4741-8C01-BAFDD3456099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AACE79B7-4E2B-4741-8C01-BAFDD3456099}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AACE79B7-4E2B-4741-8C01-BAFDD3456099}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AACE79B7-4E2B-4741-8C01-BAFDD3456099}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25063C72-C9E0-428C-B0E7-4FA782C9A0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25063C72-C9E0-428C-B0E7-4FA782C9A0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25063C72-C9E0-428C-B0E7-4FA782C9A0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25063C72-C9E0-428C-B0E7-4FA782C9A0C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C9B24C9-2275-49C3-B090-D2A72A818E62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C9B24C9-2275-49C3-B090-D2A72A818E62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C9B24C9-2275-49C3-B090-D2A72A818E62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C9B24C9-2275-49C3-B090-D2A72A818E62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AACE79B7-4E2B-4741-8C01-BAFDD3456099} = {2D70211F-102E-40A1-ACE0-F5D54EB85D2F}
+		{25063C72-C9E0-428C-B0E7-4FA782C9A0C0} = {2D70211F-102E-40A1-ACE0-F5D54EB85D2F}
+		{5C9B24C9-2275-49C3-B090-D2A72A818E62} = {2D70211F-102E-40A1-ACE0-F5D54EB85D2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0E26EA05-234B-42C5-A19A-C0DD3370B2FA}
